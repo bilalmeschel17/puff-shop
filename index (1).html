@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop Puff 🌬️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --card: #1a1a25;
+      --accent: #7c3aed;
+      --accent2: #c026d3;
+      --glow: #a855f7;
+      --text: #f0eeff;
+      --muted: #7b7a9a;
+      --border: rgba(124,58,237,0.2);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* BG ambiance */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80vw;
+      height: 60vh;
+      background: radial-gradient(ellipse, rgba(124,58,237,0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ---- HEADER ---- */
+    header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+
+    .logo {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 12vw, 96px);
+      letter-spacing: 4px;
+      line-height: 1;
+      animation: fadeDown 0.8s ease both;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 8px;
+      animation: fadeDown 0.8s 0.15s ease both;
+    }
+
+    /* badge dispo */
+    .badge-dispo {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 6px 16px;
+      font-size: 12px;
+      color: var(--glow);
+      margin-top: 18px;
+      animation: fadeDown 0.8s 0.25s ease both;
+    }
+    .dot {
+      width: 7px; height: 7px;
+      background: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #22c55e;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ---- SECTION ---- */
+    section {
+      position: relative;
+      z-index: 5;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 3px;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title span.line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ---- CARDS ---- */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: border-color 0.2s, transform 0.2s;
+      animation: fadeUp 0.6s ease both;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .card-left { display: flex; align-items: center; gap: 16px; }
+
+    .emoji-box {
+      width: 52px; height: 52px;
+      background: rgba(124,58,237,0.15);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+
+    .card-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+    .card-sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .card-right { text-align: right; flex-shrink: 0; }
+    .price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .unit { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+    /* ---- SAVEURS GRID ---- */
+    .saveurs-section { margin-bottom: 50px; }
+    .saveurs-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .saveur-tag {
+      background: rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 99px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: var(--text);
+      transition: background 0.2s;
+    }
+    .saveur-tag:hover {
+      background: rgba(124,58,237,0.25);
+    }
+
+    /* ---- CTA ---- */
+    .cta-block {
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(192,38,211,0.15));
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .cta-block h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 30px;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .cta-block p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 22px;
+    }
+
+    .btn-telegram {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      padding: 14px 32px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 30px rgba(124,58,237,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-telegram:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(124,58,237,0.5);
+    }
+    .btn-telegram svg { width: 20px; height: 20px; fill: white; }
+
+    /* ---- INFO LIVRAISON ---- */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 12px;
+      margin-bottom: 50px;
+    }
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 14px;
+      text-align: center;
+    }
+    .info-card .icon { font-size: 24px; margin-bottom: 8px; }
+    .info-card .label { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+    /* ---- FOOTER ---- */
+    footer {
+      position: relative; z-index: 5;
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ---- ANIMATIONS ---- */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.12s; }
+    .card:nth-child(3) { animation-delay: 0.18s; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">🌬️ PUFF SHOP</div>
+    <div class="tagline">Qualité premium • Livraison rapide</div>
+    <div class="badge-dispo">
+      <span class="dot"></span>
+      Disponible 24h/24 — Stock à jour
+    </div>
+  </header>
+
+  <!-- PRODUITS -->
+  <section>
+    <div class="section-title">
+      Nos produits <span class="line"></span>
+    </div>
+
+    <!-- JNR 16K -->
+    <div class="card">
+      <div class="card-left">
+        <div class="emoji-box">🟣</div>
+        <div>
+          <div class="card-name">JNR 16K</div>
+          <div class="card-sub">16 000 puffs • Toutes saveurs</div>
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="price">Prix sur commande</div>
+        <div class="unit">Demande via Telegram</div>
+      </div>
+    </div>
+
+    <!-- RAZZ BAR 60K -->
+    <div class="card">
+      <div class="card-left">
+        <div class="emoji-box">🔴</div>
+        <div>
+          <div class="card-name">Razz Bar 60K</div>
+          <div class="card-sub">60 000 puffs • Toutes saveurs</div>
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="price">Prix sur commande</div>
+        <div class="unit">Demande via Telegram</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAVEURS -->
+  <section class="saveurs-section">
+    <div class="section-title">Saveurs dispo <span class="line"></span></div>
+    <div class="saveurs-grid">
+      <span class="saveur-tag">🍓 Fraise</span>
+      <span class="saveur-tag">🍉 Pastèque</span>
+      <span class="saveur-tag">🍇 Raisin</span>
+      <span class="saveur-tag">🥭 Mangue</span>
+      <span class="saveur-tag">🍑 Pêche</span>
+      <span class="saveur-tag">🫐 Myrtille</span>
+      <span class="saveur-tag">🍋 Citron</span>
+      <span class="saveur-tag">🍈 Melon</span>
+      <span class="saveur-tag">🌴 Coco</span>
+      <span class="saveur-tag">🍒 Cerise</span>
+      <span class="saveur-tag">🍬 Bubble Gum</span>
+      <span class="saveur-tag">🧃 Tropical</span>
+      <span class="saveur-tag">🍦 Vanille</span>
+      <span class="saveur-tag">❄️ Menthe</span>
+      <span class="saveur-tag">+ beaucoup d'autres...</span>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="icon">⚡</div>
+        <div class="label">Réponse rapide</div>
+      </div>
+      <div class="info-card">
+        <div class="icon">🔒</div>
+        <div class="label">Discret & sécurisé</div>
+      </div>
+      <div class="info-card">
+        <div class="icon">📦</div>
+        <div class="label">Stock permanent</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section>
+    <div class="cta-block">
+      <h2>Prêt à commander ?</h2>
+      <p>Contacte-nous directement sur Telegram pour passer ta commande</p>
+      <!-- ⚠️ Remplace TON_BOT_USERNAME par l'username de ton bot -->
+      <a href="https://t.me/Meschel_bot" class="btn-telegram">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/>
+        </svg>
+        Commander sur Telegram
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 Puff Shop — Tous droits réservés
+  </footer>
+
+</body>
+</html>
