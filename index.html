@@ -168,6 +168,35 @@
 </head>
 <body>
 
+<!-- CITY SELECTOR PAGE -->
+<div class="city-page" id="cityPage">
+  <div class="city-logo">MESCHEL PUFF SHOP</div>
+  <div class="city-sub">Qualité premium • Livraison rapide</div>
+  <div class="city-question">📍 Tu es dans quelle ville ?</div>
+  <div class="city-grid">
+    <div class="city-btn" onclick="selectCity('Alès')">
+      <div class="city-emoji">🏙️</div>
+      <div class="city-name">Alès</div>
+      <div class="city-desc">Livraison dispo</div>
+    </div>
+    <div class="city-btn" onclick="selectCity('Nîmes')">
+      <div class="city-emoji">🏛️</div>
+      <div class="city-name">Nîmes</div>
+      <div class="city-desc">Livraison dispo</div>
+    </div>
+    <div class="city-btn" onclick="selectCity('Montpellier')">
+      <div class="city-emoji">🌊</div>
+      <div class="city-name">Montpellier</div>
+      <div class="city-desc">Livraison dispo</div>
+    </div>
+  </div>
+</div>
+
+<!-- CITY INDICATOR -->
+<div class="city-indicator" id="cityIndicator" onclick="changeCity()">
+  📍 <span id="cityLabel">Alès</span> <span style="color:var(--accent);font-size:10px;">changer</span>
+</div>
+
 <button class="cart-toggle" onclick="toggleCart()">🛒 Panier <span class="cart-toggle-badge" id="cartCount">0</span></button>
 
 <header>
@@ -852,6 +881,19 @@
   const FLAVORS = ['🍓 Fraise','🍉 Pastèque','🍇 Raisin','🥭 Mangue','🍑 Pêche','🫐 Myrtille','🍋 Citron','🍈 Melon','🌴 Coco','🍒 Cerise','🍬 Bubble Gum','🧃 Tropical','🍦 Vanille','❄️ Menthe','🍏 Pomme verte','🥝 Kiwi','🍊 Orange','🍍 Ananas','🫒 Menthe glaciale','🍧 Fraise glacée','💜 Raisin givré','🌊 Blueberry ice'];
   const PRODUCTS = { jnr:{name:"JNR 16K",emoji:"🟣",sub:"16 000 puffs",price:10}, razz:{name:"Razz Bar 60K",emoji:"🔴",sub:"60 000 puffs",price:15} };
 
+
+  // CITY
+  let selectedCity = '';
+  function selectCity(city) {
+    selectedCity = city;
+    document.getElementById('cityPage').classList.add('hidden');
+    document.getElementById('cityLabel').textContent = city;
+    document.getElementById('cityIndicator').classList.add('show');
+  }
+  function changeCity() {
+    document.getElementById('cityPage').classList.remove('hidden');
+  }
+
   let cart=[], currentProduct=null, selectedFlavor=null;
   let cartTimer=null, cartSeconds=300;
   let payTimer=null, paySeconds=300;
@@ -923,8 +965,8 @@
     currentOrderNum=genOrderNum();
     ['orderNum','ppOrderNum','virOrderNum','espOrderNum'].forEach(id=>document.getElementById(id).textContent=currentOrderNum);
     ['ppRef','virRef'].forEach(id=>document.getElementById(id).textContent=currentOrderNum);
-    const total=cart.reduce((s,i)=>s+PRODUCTS[i.product].price,0); document.getElementById('orderTotalAmt').textContent=total+' €'; document.getElementById('ppAmount').textContent=total+' €'; const items=document.getElementById('orderItems');
-    items.innerHTML=cart.map(item=>`<div class="order-item-row"><span>${item.emoji} ${item.name}</span><span class="fl">${item.flavor}</span></div>`).join('');
+    const total=cart.reduce((s,i)=>s+PRODUCTS[i.product].price,0); document.getElementById('orderTotalAmt').textContent=total+' €'; document.getElementById('ppAmount').textContent=total+' €'; const cityRow=`<div class='order-item-row'><span>📍 Ville</span><span class='fl'>${selectedCity}</span></div>`; const items=document.getElementById('orderItems');
+    items.innerHTML=cityRow+cart.map(item=>`<div class="order-item-row"><span>${item.emoji} ${item.name}</span><span class="fl">${item.flavor}</span></div>`).join('');
     showPage('paymentPage');
     document.getElementById('cartSidebar').classList.remove('open');
     startPayTimer();
@@ -958,7 +1000,7 @@
     const ad=document.getElementById('ppAdresse').value.trim();
     if(!tg||!ad){ alert('Remplis ton pseudo Telegram et ton adresse.'); return; }
     clearInterval(payTimer);
-    document.getElementById('successMsg').textContent='Paiement PayPal confirmé ✅ On te contacte sur Telegram ('+tg+') pour organiser la livraison à : '+ad;
+    document.getElementById('successMsg').textContent='Paiement PayPal confirmé ✅ Ville : '+selectedCity+' • On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
     showSuccess();
   }
 
@@ -967,7 +1009,7 @@
     const ad=document.getElementById('virAdresse').value.trim();
     if(!tg||!ad){ alert('Remplis ton pseudo Telegram et ton adresse.'); return; }
     clearInterval(payTimer);
-    document.getElementById('successMsg').textContent='Virement confirmé ✅ On te contacte sur Telegram ('+tg+') dès réception du virement pour la livraison à : '+ad;
+    document.getElementById('successMsg').textContent='Virement confirmé ✅ Ville : '+selectedCity+' • On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
     showSuccess();
   }
 
@@ -976,7 +1018,7 @@
     const ad=document.getElementById('espAdresse').value.trim();
     if(!tg||!ad){ alert('Remplis ton pseudo Telegram et ton adresse.'); return; }
     clearInterval(payTimer);
-    document.getElementById('successMsg').textContent='Commande prise en charge ✅ On te contacte sur Telegram ('+tg+') pour organiser la remise en espèces à : '+ad;
+    document.getElementById('successMsg').textContent='Commande prise en charge ✅ Ville : '+selectedCity+' • On te contacte sur Telegram ('+tg+') à : '+ad;
     showSuccess();
   }
 
