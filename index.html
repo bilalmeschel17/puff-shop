@@ -7,6 +7,75 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     :root {
+      --bg: #f5f0ff; --card: #ffffff; --card2: #f0ebff;
+      --accent: #8b5cf6; --accent2: #ec4899; --accent3: #f97316;
+      --green: #10b981; --red: #ef4444;
+      --text: #1a0a2e; --muted: #5b4d7a; --border: rgba(139,92,246,0.18);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',sans-serif; min-height:100vh; color:var(--text); }
+
+    /* ===== PAGE VILLE ===== */
+    #cityPage {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      min-height:100vh; padding:40px 20px;
+      background:linear-gradient(160deg,#fdf4ff 0%,#f0e8ff 50%,#fff8f0 100%);
+    }
+    .city-logo {
+      font-family:"Bebas Neue",sans-serif;
+      font-size:clamp(38px,8vw,76px);
+      letter-spacing:4px;
+      background:linear-gradient(135deg,#8b5cf6,#ec4899,#f97316);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-align:center; margin-bottom:6px;
+    }
+    .city-tagline {
+      color:#5b4d7a; font-size:12px; letter-spacing:3px;
+      text-transform:uppercase; margin-bottom:50px; text-align:center;
+    }
+    .city-question {
+      font-family:"Bebas Neue",sans-serif; font-size:24px;
+      letter-spacing:2px; color:#1a0a2e; margin-bottom:28px; text-align:center;
+    }
+    .city-row {
+      display:grid; grid-template-columns:repeat(3,1fr);
+      gap:20px; width:100%; max-width:680px;
+    }
+    .city-card {
+      background:#fff; border:2px solid rgba(139,92,246,0.15);
+      border-radius:22px; padding:40px 16px 32px; cursor:pointer;
+      text-align:center; transition:all .22s;
+      box-shadow:0 4px 24px rgba(139,92,246,0.08);
+    }
+    .city-card:hover {
+      border-color:#8b5cf6; transform:translateY(-6px);
+      box-shadow:0 16px 40px rgba(139,92,246,0.2);
+    }
+    .city-card .cc-emoji { font-size:46px; margin-bottom:14px; }
+    .city-card .cc-name {
+      font-family:"Bebas Neue",sans-serif; font-size:26px;
+      letter-spacing:2px; color:#1a0a2e; margin-bottom:8px;
+    }
+    .city-card .cc-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2);
+      border-radius:99px; padding:4px 12px; font-size:11px; color:#065f46;
+    }
+
+    /* ===== PAGE SHOP ===== */
+    #shopPage { display:none; background:linear-gradient(160deg,#fdf4ff 0%,#f5f0ff 40%,#fff8f0 100%); min-height:100vh; }
+
+    .city-indicator {
+      position:fixed; top:16px; left:16px; z-index:50;
+      background:#fff; border:1px solid rgba(139,92,246,0.2); border-radius:10px;
+      padding:7px 14px; font-size:12px; color:#5b4d7a;
+      display:flex; align-items:center; gap:6px;
+      box-shadow:0 2px 10px rgba(139,92,246,0.08); cursor:pointer;
+    }
+    .city-indicator:hover { border-color:var(--accent); color:#1a0a2e; }
+
+    
+    :root {
       --bg: #0a0a0f; --surface: #111118; --card: #16161f; --card2: #1c1c28;
       --accent: #7c3aed; --accent2: #c026d3; --green: #22c55e; --red: #ef4444;
       --text: #f0eeff; --muted: #6b6a8a; --border: rgba(124,58,237,0.18);
@@ -164,42 +233,45 @@
 
     @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
     ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+  
   </style>
 </head>
 <body>
 
-<!-- CITY SELECTOR PAGE -->
-<div class="city-page" id="cityPage">
+<!-- ===== PAGE VILLE ===== -->
+<div id="cityPage">
   <div class="city-logo">MESCHEL PUFF SHOP</div>
-  <div class="city-sub">Qualité premium • Livraison rapide</div>
+  <div class="city-tagline">Qualité premium • Livraison rapide</div>
   <div class="city-question">📍 Tu es dans quelle ville ?</div>
-  <div class="city-grid">
-    <div class="city-btn" onclick="selectCity('Alès')">
-      <div class="city-emoji">🏙️</div>
-      <div class="city-name">Alès</div>
-      <div class="city-desc">Livraison dispo</div>
+  <div class="city-row">
+    <div class="city-card" onclick="selectCity('Alès')">
+      <div class="cc-emoji">🏙️</div>
+      <div class="cc-name">Alès</div>
+      <div class="cc-badge"><span style="width:6px;height:6px;background:#10b981;border-radius:50%;display:inline-block"></span> Livraison dispo</div>
     </div>
-    <div class="city-btn" onclick="selectCity('Nîmes')">
-      <div class="city-emoji">🏛️</div>
-      <div class="city-name">Nîmes</div>
-      <div class="city-desc">Livraison dispo</div>
+    <div class="city-card" onclick="selectCity('Nîmes')">
+      <div class="cc-emoji">🏛️</div>
+      <div class="cc-name">Nîmes</div>
+      <div class="cc-badge"><span style="width:6px;height:6px;background:#10b981;border-radius:50%;display:inline-block"></span> Livraison dispo</div>
     </div>
-    <div class="city-btn" onclick="selectCity('Montpellier')">
-      <div class="city-emoji">🌊</div>
-      <div class="city-name">Montpellier</div>
-      <div class="city-desc">Livraison dispo</div>
+    <div class="city-card" onclick="selectCity('Montpellier')">
+      <div class="cc-emoji">🌊</div>
+      <div class="cc-name">Montpellier</div>
+      <div class="cc-badge"><span style="width:6px;height:6px;background:#10b981;border-radius:50%;display:inline-block"></span> Livraison dispo</div>
     </div>
   </div>
 </div>
 
-<!-- CITY INDICATOR -->
-<div class="city-indicator" id="cityIndicator" onclick="changeCity()">
-  📍 <span id="cityLabel">Alès</span> <span style="color:var(--accent);font-size:10px;">changer</span>
-</div>
+<!-- ===== PAGE SHOP ===== -->
+<div id="shopPage">
 
-<button class="cart-toggle" onclick="toggleCart()">🛒 Panier <span class="cart-toggle-badge" id="cartCount">0</span></button>
+  <div class="city-indicator" onclick="changeCity()">
+    📍 <span id="cityLabel">—</span> <span style="color:var(--accent);font-size:10px;margin-left:2px">← changer</span>
+  </div>
 
-<header>
+  <button class="cart-toggle" onclick="toggleCart()">🛒 Panier <span class="cart-toggle-badge" id="cartCount">0</span></button>
+
+  <header>
   <div class="logo">MESCHEL PUFF SHOP</div>
   <div class="tagline">Qualité premium • Livraison rapide</div>
   <div class="badge"><span class="dot"></span> Disponible 24h/24 — Stock à jour</div>
@@ -698,20 +770,7 @@
   </div>
 </main>
 
-<!-- MODAL SAVEURS -->
-<div class="overlay" id="flavorOverlay">
-  <div class="modal">
-    <div class="modal-title" id="modalTitle">JNR 16K</div>
-    <div class="modal-sub">Sélectionne ta saveur</div>
-    <div class="flavors-grid" id="flavorsGrid"></div>
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
-      <button class="btn-add" id="btnAddCart" onclick="addToCart()" disabled>Ajouter au panier</button>
-    </div>
-  </div>
-</div>
-
-<!-- PANIER -->
+  <!-- PANIER -->
 <div class="cart-sidebar" id="cartSidebar">
   <div class="cart-header">
     <div style="display:flex;align-items:center;gap:10px">
@@ -877,22 +936,33 @@
   <button class="btn-outline" onclick="resetAll()">← Retour à l'accueil</button>
 </div>
 
+
+
+</div><!-- end shopPage -->
+
 <script>
+  // CITY
+  let selectedCity = '';
+
+  function selectCity(city) {
+    selectedCity = city;
+    document.getElementById('cityPage').style.display = 'none';
+    document.getElementById('shopPage').style.display = 'block';
+    document.getElementById('cityLabel').textContent = city;
+  }
+
+  function changeCity() {
+    cart = []; renderCart();
+    document.getElementById('shopPage').style.display = 'none';
+    document.getElementById('cityPage').style.display = 'flex';
+  }
+
+  
   const FLAVORS = ['🍓 Fraise','🍉 Pastèque','🍇 Raisin','🥭 Mangue','🍑 Pêche','🫐 Myrtille','🍋 Citron','🍈 Melon','🌴 Coco','🍒 Cerise','🍬 Bubble Gum','🧃 Tropical','🍦 Vanille','❄️ Menthe','🍏 Pomme verte','🥝 Kiwi','🍊 Orange','🍍 Ananas','🫒 Menthe glaciale','🍧 Fraise glacée','💜 Raisin givré','🌊 Blueberry ice'];
   const PRODUCTS = { jnr:{name:"JNR 16K",emoji:"🟣",sub:"16 000 puffs",price:10}, razz:{name:"Razz Bar 60K",emoji:"🔴",sub:"60 000 puffs",price:15} };
 
 
-  // CITY
-  let selectedCity = '';
-  function selectCity(city) {
-    selectedCity = city;
-    document.getElementById('cityPage').classList.add('hidden');
-    document.getElementById('cityLabel').textContent = city;
-    document.getElementById('cityIndicator').classList.add('show');
-  }
-  function changeCity() {
-    document.getElementById('cityPage').classList.remove('hidden');
-  }
+  
 
   let cart=[], currentProduct=null, selectedFlavor=null;
   let cartTimer=null, cartSeconds=300;
@@ -1030,6 +1100,7 @@
   function resetAll(){ hideAllPages(); cart=[]; renderCart(); currentOrderNum=''; ['ppTelegram','ppAdresse','virTelegram','virAdresse','espTelegram','espAdresse','espDispo'].forEach(id=>document.getElementById(id).value=''); }
 
   document.getElementById('flavorOverlay').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+
 </script>
 </body>
 </html>
