@@ -923,6 +923,32 @@
     .account-item:hover { background:var(--blush); }
     body.dark .account-item:hover { background:rgba(255,255,255,0.05); }
 
+  
+    /* PENDING PAGE */
+    #pendingPage {
+      display:none; position:fixed; inset:0;
+      background:var(--cream);
+      z-index:400;
+      flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; padding:40px;
+    }
+    .pending-icon { font-size:48px; margin-bottom:24px; }
+    .pending-title {
+      font-family:'Cormorant Garamond',serif;
+      font-size:clamp(36px,6vw,52px); font-weight:600;
+      color:var(--text); letter-spacing:-2px; line-height:1; margin-bottom:16px;
+    }
+    .pending-title em { font-style:italic; color:var(--rose2); }
+    .pending-sub { font-size:14px; color:var(--muted); max-width:360px; line-height:1.8; margin-bottom:20px; }
+    .pending-order {
+      font-family:'Cormorant Garamond',serif;
+      font-size:22px; font-weight:700; color:var(--rose2);
+      border:1px solid var(--border); padding:10px 24px; margin-bottom:28px;
+      letter-spacing:1px;
+    }
+    .badge-pending { display:inline-block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#b07a00; background:rgba(176,122,0,.1); border:1px solid rgba(176,122,0,.25); padding:3px 10px; margin-bottom:6px; }
+    .badge-confirmed { display:inline-block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--green); background:rgba(90,154,106,.1); border:1px solid rgba(90,154,106,.25); padding:3px 10px; margin-bottom:6px; }
+
   </style>
 </head>
 <body>
@@ -1283,7 +1309,7 @@
       </div>
         <div class="form-group"><label class="form-label">Adresse de livraison</label><input class="form-input" id="ppAdresse" placeholder="Rue, ville..."/></div>
       </div>
-      <button class="btn-primary" onclick="confirmPP()">J'ai payé — Confirmer →</button>
+      <button class="btn-primary" onclick="confirmPP()">Envoyer ma commande →</button>
     </div>
   </div>
 
@@ -1310,7 +1336,7 @@
       </div>
         <div class="form-group"><label class="form-label">Adresse de livraison</label><input class="form-input" id="virAdresse" placeholder="Rue, ville..."/></div>
       </div>
-      <button class="btn-primary" onclick="confirmVir()">J'ai viré — Confirmer →</button>
+      <button class="btn-primary" onclick="confirmVir()">Envoyer ma commande →</button>
     </div>
   </div>
 
@@ -1334,6 +1360,15 @@
       </div>
       <button class="btn-primary" onclick="confirmEsp()">Confirmer la commande →</button>
     </div>
+  </div>
+
+  <!-- PENDING PAGE -->
+  <div id="pendingPage">
+    <div class="pending-icon">⏳</div>
+    <div class="pending-title">Commande<br/><em>envoyée.</em></div>
+    <p class="pending-sub">Ton paiement est en cours de vérification. Tu recevras une confirmation sur Telegram dès qu'on aura validé.</p>
+    <div class="pending-order" id="pendingOrder">#SHOP-XXXX</div>
+    <button class="btn-outline" onclick="document.getElementById('pendingPage').style.display='none';">← Retour au shop</button>
   </div>
 
   <!-- ORDER HISTORY PAGE -->
@@ -1448,7 +1483,7 @@
   // ⚠️ Remplace avec l'URL de ton bot Railway après déploiement
   const BOT_URL = "https://meschelbot-production.up.railway.app";
 
-  async function sendTicket(payment, telegram, adresse, dispo) {
+  async function sendTicket(payment, telegram, adresse, dispo, needsConfirm) {
     const total = cart.reduce((s,i)=>s+PRODUCTS[i.product].price,0);
     const items = cart.map(i=>({name:PRODUCTS[i.product].name, flavor:i.flavor, price:PRODUCTS[i.product].price}));
     try {
@@ -1456,7 +1491,7 @@
         method:"POST",
         mode:"no-cors",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({order_num:currentOrderNum, city:selectedCity, payment:payment, telegram:telegram, adresse:adresse, items:items, total:total, dispo:dispo||""})
+        body:JSON.stringify({order_num:currentOrderNum, city:selectedCity, payment:payment, telegram:telegram, adresse:adresse, items:items, total:total, dispo:dispo||"", needs_confirm:!!needsConfirm})
       });
     } catch(e) { console.log("Ticket:", e); }
   }
@@ -1465,18 +1500,16 @@
     const tg=document.getElementById('ppTelegram').value.trim(), ad=document.getElementById('ppAdresse').value.trim();
     if(!tg||!ad){alert('Remplis tous les champs.');return;}
     clearInterval(payTimer);
-    document.getElementById('successMsg').textContent='Paiement PayPal — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
-    await sendTicket("paypal", tg, ad, "");
-    showSuccess(tg, ad);
+    await sendTicket("paypal", tg, ad, "", true);
+    showPending(tg, ad);
   }
 
   async function confirmVir() {
     const tg=document.getElementById('virTelegram').value.trim(), ad=document.getElementById('virAdresse').value.trim();
     if(!tg||!ad){alert('Remplis tous les champs.');return;}
     clearInterval(payTimer);
-    document.getElementById('successMsg').textContent='Virement confirmé — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
-    await sendTicket("virement", tg, ad, "");
-    showSuccess(tg, ad);
+    await sendTicket("virement", tg, ad, "", true);
+    showPending(tg, ad);
   }
 
   async function confirmEsp() {
@@ -1484,9 +1517,33 @@
     const dispo=document.getElementById('espDispo').value.trim();
     if(!tg||!ad){alert('Remplis tous les champs.');return;}
     clearInterval(payTimer);
-    document.getElementById('successMsg').textContent='Commande prise en charge — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') à : '+ad;
-    await sendTicket("especes", tg, ad, dispo);
+    await sendTicket("especes", tg, ad, dispo, false);
     showSuccess(tg, ad);
+  }
+
+  function showPending(tg, ad) {
+    // Sauvegarder la commande en attente dans l'historique
+    var orders = [];
+    try { orders = JSON.parse(localStorage.getItem('meschel_orders') || '[]'); } catch(e) {}
+    var total = cart.reduce(function(s,i){ return s + PRODUCTS[i.product].price; }, 0);
+    var now = new Date();
+    var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+    orders.unshift({
+      ref: currentOrderNum,
+      date: dateStr,
+      city: selectedCity,
+      payment: selectedPM,
+      telegram: tg || '',
+      adresse: ad || '',
+      items: cart.map(function(i){ return {name: PRODUCTS[i.product].name, flavor: i.flavor, price: PRODUCTS[i.product].price}; }),
+      total: total,
+      status: 'pending'
+    });
+    localStorage.setItem('meschel_orders', JSON.stringify(orders));
+    hideAllPages();
+    document.getElementById('pendingOrder').textContent = currentOrderNum;
+    document.getElementById('pendingPage').style.display = 'flex';
+    cart = []; renderCart(); currentOrderNum = '';
   }
 
     function showSuccess(tg, ad) {
@@ -1527,11 +1584,16 @@
       container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px 0;font-style:italic;font-size:16px">Aucune commande pour l\'instant</p>';
     } else {
       container.innerHTML = orders.map(function(o) {
+        var isPending = o.status === 'pending';
+        var badge = isPending
+          ? '<span class="badge-pending">⏳ En attente de confirmation</span>'
+          : '<span class="badge-confirmed">✅ Confirmée</span>';
         return '<div style="background:var(--white);border:1px solid var(--border);padding:20px;margin-bottom:12px;">' +
-          '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">' +
+          '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">' +
             '<span style="font-family:Cormorant Garamond,serif;font-size:16px;font-weight:700;color:var(--rose2)">' + o.ref + '</span>' +
             '<span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">' + o.date + ' · ' + (pmLabels[o.payment]||o.payment) + '</span>' +
           '</div>' +
+          '<div style="margin-bottom:10px">' + badge + '</div>' +
           '<div style="font-size:10px;color:var(--muted);margin-bottom:8px">📍 ' + o.city + '</div>' +
           o.items.map(function(i){ return '<div style="font-size:13px;color:var(--text);padding:5px 0;border-bottom:1px solid var(--border)">' + i.name + ' — ' + i.flavor + '<span style="float:right;color:var(--rose2);font-weight:600">' + i.price + ' €</span></div>'; }).join('') +
           '<div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">' +
