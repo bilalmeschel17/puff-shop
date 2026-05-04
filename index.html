@@ -1156,11 +1156,51 @@
   function selectPM(el,pm){document.querySelectorAll('.pm-option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');selectedPM=pm;}
   function goToPayDetail(){if(selectedPM==='paypal')showPage('paypalPage');else if(selectedPM==='virement')showPage('virementPage');else showPage('especesPage');}
   function closePayment(){clearInterval(payTimer);hideAllPages();cart=[];renderCart();}
-  function confirmPP(){const tg=document.getElementById('ppTelegram').value.trim(),ad=document.getElementById('ppAdresse').value.trim();if(!tg||!ad){alert('Remplis tous les champs.');return;}clearInterval(payTimer);document.getElementById('successMsg').textContent='Paiement PayPal — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;showSuccess();}
-  function confirmVir(){const tg=document.getElementById('virTelegram').value.trim(),ad=document.getElementById('virAdresse').value.trim();if(!tg||!ad){alert('Remplis tous les champs.');return;}clearInterval(payTimer);document.getElementById('successMsg').textContent='Virement confirmé — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;showSuccess();}
-  function confirmEsp(){const tg=document.getElementById('espTelegram').value.trim(),ad=document.getElementById('espAdresse').value.trim();if(!tg||!ad){alert('Remplis tous les champs.');return;}clearInterval(payTimer);document.getElementById('successMsg').textContent='Commande prise en charge — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') à : '+ad;showSuccess();}
-  function showSuccess(){document.getElementById('successOrder').textContent=currentOrderNum;document.getElementById('successPage').classList.add('active');}
-  function resetAll(){hideAllPages();document.getElementById('successPage').classList.remove('active');cart=[];renderCart();currentOrderNum='';['ppTelegram','ppAdresse','virTelegram','virAdresse','espTelegram','espAdresse','espDispo'].forEach(id=>document.getElementById(id).value='');}
+  // ⚠️ Remplace avec l'URL de ton bot Railway après déploiement
+  const BOT_URL = "https://meschelbot-production.up.railway.app";
+
+  async function sendTicket(payment, telegram, adresse, dispo) {
+    const total = cart.reduce((s,i)=>s+PRODUCTS[i.product].price,0);
+    const items = cart.map(i=>({name:PRODUCTS[i.product].name, flavor:i.flavor, price:PRODUCTS[i.product].price}));
+    try {
+      await fetch(BOT_URL + "/ticket", {
+        method:"POST",
+        mode:"no-cors",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({order_num:currentOrderNum, city:selectedCity, payment:payment, telegram:telegram, adresse:adresse, items:items, total:total, dispo:dispo||""})
+      });
+    } catch(e) { console.log("Ticket:", e); }
+  }
+
+  async function confirmPP() {
+    const tg=document.getElementById('ppTelegram').value.trim(), ad=document.getElementById('ppAdresse').value.trim();
+    if(!tg||!ad){alert('Remplis tous les champs.');return;}
+    clearInterval(payTimer);
+    document.getElementById('successMsg').textContent='Paiement PayPal — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
+    await sendTicket("paypal", tg, ad, "");
+    showSuccess();
+  }
+
+  async function confirmVir() {
+    const tg=document.getElementById('virTelegram').value.trim(), ad=document.getElementById('virAdresse').value.trim();
+    if(!tg||!ad){alert('Remplis tous les champs.');return;}
+    clearInterval(payTimer);
+    document.getElementById('successMsg').textContent='Virement confirmé — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
+    await sendTicket("virement", tg, ad, "");
+    showSuccess();
+  }
+
+  async function confirmEsp() {
+    const tg=document.getElementById('espTelegram').value.trim(), ad=document.getElementById('espAdresse').value.trim();
+    const dispo=document.getElementById('espDispo').value.trim();
+    if(!tg||!ad){alert('Remplis tous les champs.');return;}
+    clearInterval(payTimer);
+    document.getElementById('successMsg').textContent='Commande prise en charge — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') à : '+ad;
+    await sendTicket("especes", tg, ad, dispo);
+    showSuccess();
+  }
+
+    function resetAll(){hideAllPages();document.getElementById('successPage').classList.remove('active');cart=[];renderCart();currentOrderNum='';['ppTelegram','ppAdresse','virTelegram','virAdresse','espTelegram','espAdresse','espDispo'].forEach(id=>document.getElementById(id).value='');}
 </script>
 </body>
 </html>
