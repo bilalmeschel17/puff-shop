@@ -848,6 +848,81 @@
 
     /* THEME TOGGLE */
 
+  
+    /* NAV ICONS */
+    .nav-icon-btn {
+      background:transparent; border:none;
+      width:40px; height:40px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--text);
+      position:relative; border-radius:4px;
+      transition:background .15s, color .15s;
+    }
+    .nav-icon-btn:hover { background:var(--blush); color:var(--rose2); }
+    body.dark .nav-icon-btn:hover { background:rgba(255,255,255,0.06); }
+
+    /* CART BUBBLE */
+    .cart-nav-btn { position:relative; }
+    .cart-bubble {
+      position:absolute; top:4px; right:4px;
+      background:var(--rose2); color:#fff;
+      min-width:16px; height:16px;
+      border-radius:99px; font-size:9px; font-weight:700;
+      display:flex; align-items:center; justify-content:center;
+      padding:0 3px; pointer-events:none;
+      transition:transform .2s;
+    }
+
+    /* TOGGLE THEME */
+    .toggle-theme-btn { background:transparent; border:none; cursor:pointer; padding:6px; display:flex; align-items:center; }
+    .tt-track {
+      width:42px; height:23px;
+      background:var(--sand);
+      border-radius:99px;
+      position:relative;
+      transition:background .3s;
+      border:1px solid var(--border);
+    }
+    .tt-thumb {
+      width:17px; height:17px;
+      background:var(--white);
+      border-radius:50%;
+      position:absolute; top:2px; left:2px;
+      transition:transform .3s, background .3s;
+      box-shadow:0 1px 4px rgba(0,0,0,.2);
+    }
+    body.dark .tt-track { background:#3a2040; border-color:rgba(255,255,255,0.1); }
+    body.dark .tt-thumb { transform:translateX(19px); background:var(--rose2); }
+
+    /* ACCOUNT DROPDOWN */
+    .account-wrap { position:relative; }
+    .account-dropdown {
+      display:none; position:absolute;
+      top:calc(100% + 8px); right:0;
+      background:var(--white);
+      border:1px solid var(--border);
+      min-width:190px; z-index:600;
+      box-shadow:0 8px 32px rgba(28,20,16,0.12);
+    }
+    body.dark .account-dropdown { background:var(--surface,#16161f); border-color:rgba(255,255,255,0.1); }
+    .account-dropdown.open { display:block; }
+    .account-top {
+      padding:14px 18px 10px;
+      font-size:12px; font-weight:600;
+      color:var(--text); letter-spacing:.5px;
+      border-bottom:1px solid var(--border);
+    }
+    .account-item {
+      display:flex; align-items:center; gap:10px;
+      padding:13px 18px;
+      font-size:13px; color:var(--text);
+      cursor:pointer; transition:background .15s;
+      border-bottom:1px solid var(--border);
+    }
+    .account-item:last-child { border:none; }
+    .account-item:hover { background:var(--blush); }
+    body.dark .account-item:hover { background:rgba(255,255,255,0.05); }
+
   </style>
 </head>
 <body>
@@ -885,9 +960,43 @@
     <div class="topbar-brand">Meschel<em>.</em></div>
     <div class="topbar-center">Puff Premium · Livraison Rapide</div>
     <div class="topbar-right">
-      <button class="theme-toggle" onclick="toggleTheme()" title="Changer le thème"></button>
-      <div class="city-pill" onclick="changeCity()">📍 <span id="cityLabel">—</span> · changer</div>
-      <button class="cart-btn" onclick="toggleCart()">Panier <span class="cart-count" id="cartCount">0</span></button>
+
+      <!-- Toggle thème -->
+      <button class="toggle-theme-btn" onclick="toggleTheme()">
+        <div class="tt-track"><div class="tt-thumb"></div></div>
+      </button>
+
+      <!-- Ville -->
+      <div class="city-pill" onclick="changeCity()">📍 <span id="cityLabel">—</span></div>
+
+      <!-- Compte -->
+      <div class="account-wrap">
+        <button class="nav-icon-btn" onclick="toggleAccountMenu()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </button>
+        <div class="account-dropdown" id="accountDropdown">
+          <div class="account-top">Mon compte</div>
+          <div class="account-item" onclick="showOrderHistory();closeAccountMenu()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            Commandes
+          </div>
+          <div class="account-item" onclick="changeCity();closeAccountMenu()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Changer de ville
+          </div>
+        </div>
+      </div>
+
+      <!-- Panier -->
+      <button class="nav-icon-btn cart-nav-btn" onclick="toggleCart()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        <span class="cart-bubble" id="cartCount">0</span>
+      </button>
+
     </div>
   </div>
 
@@ -1259,6 +1368,19 @@
       var dd = document.getElementById('accountDropdown');
       if (dd) dd.classList.remove('open');
     }
+  });
+
+  function toggleAccountMenu() {
+    var dd = document.getElementById('accountDropdown');
+    if (dd) dd.classList.toggle('open');
+  }
+  function closeAccountMenu() {
+    var dd = document.getElementById('accountDropdown');
+    if (dd) dd.classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    var wrap = document.querySelector('.account-wrap');
+    if (wrap && !wrap.contains(e.target)) closeAccountMenu();
   });
 
   function toggleTheme() {
