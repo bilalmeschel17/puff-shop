@@ -1361,7 +1361,45 @@
     showSuccess();
   }
 
-    function resetAll(){
+  function showSuccess(){
+    document.getElementById('successOrder').textContent=currentOrderNum;
+    hideAllPages();
+    document.getElementById('successPage').classList.add('active');
+    setTimeout(()=>{
+      document.getElementById('successPage').classList.remove('active');
+      document.getElementById('successPage').style.display='none';
+      showOrderHistory();
+    }, 2000);
+  }
+
+  function showOrderHistory(){
+    const orders = JSON.parse(localStorage.getItem('meschel_orders') || '[]');
+    const container = document.getElementById('orderHistoryList');
+    const pmLabels = {paypal:'PayPal', virement:'Virement', especes:'Espèces'};
+    if(!orders.length){
+      container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px 0;font-style:italic;font-family:Cormorant Garamond,serif;font-size:18px">Aucune commande pour l\'instant</p>';
+    } else {
+      container.innerHTML = orders.map(o=>`
+        <div style="background:var(--white);border:1px solid var(--border);padding:20px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+            <span style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:var(--rose2)">${o.ref}</span>
+            <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">${o.date} · ${pmLabels[o.payment]||o.payment}</span>
+          </div>
+          <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">📍 ${o.city}</div>
+          ${o.items.map(i=>`<div style="font-size:13px;color:var(--text);padding:5px 0;border-bottom:1px solid var(--border)">${i.name} — ${i.flavor}<span style="float:right;color:var(--rose2);font-weight:600">${i.price} €</span></div>`).join('')}
+          <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">
+            <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Total</span>
+            <span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--text)">${o.total} €</span>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--muted)">📬 ${o.adresse}</div>
+        </div>
+      `).join('');
+    }
+    hideAllPages();
+    document.getElementById('orderHistoryPage').classList.add('active');
+  }
+
+  function resetAll(){
     document.getElementById('successPage').style.display='';
     document.getElementById('successPage').classList.remove('active');
     hideAllPages();
