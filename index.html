@@ -1574,11 +1574,29 @@
     }, 3000);
   }
 
-  function showOrderHistory() {
+  async function showOrderHistory() {
     var orders = [];
     try { orders = JSON.parse(localStorage.getItem('meschel_orders') || '[]'); } catch(e) {}
     var container = document.getElementById('orderHistoryList');
     if (!container) return;
+
+    // Vérifier le statut des commandes en attente auprès du bot
+    var pending = orders.filter(function(o){ return o.status === 'pending'; });
+    for (var i = 0; i < pending.length; i++) {
+      try {
+        var r = await fetch(BOT_URL + '/status/' + encodeURIComponent(pending[i].ref));
+        if (r.ok) {
+          var data = await r.json();
+          if (data.confirmed) {
+            for (var j = 0; j < orders.length; j++) {
+              if (orders[j].ref === pending[i].ref) { orders[j].status = 'confirmed'; break; }
+            }
+          }
+        }
+      } catch(e) { /* bot injoignable, on garde le statut actuel */ }
+    }
+    try { localStorage.setItem('meschel_orders', JSON.stringify(orders)); } catch(e) {}
+
     var pmLabels = {paypal:'PayPal', virement:'Virement', especes:'Espèces'};
     if (!orders.length) {
       container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px 0;font-style:italic;font-size:16px">Aucune commande pour l\'instant</p>';
