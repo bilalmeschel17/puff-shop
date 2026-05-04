@@ -820,6 +820,19 @@
     body.dark .theme-toggle::after { transform: translateX(24px); background: var(--rose2); }
     .theme-icon { font-size: 13px; }
 
+  
+    .orders-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 40px; height: 40px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: border-color .2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .orders-btn:hover { border-color: var(--rose2); }
+
   </style>
 </head>
 <body>
@@ -859,7 +872,7 @@
     <div class="topbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="Changer le thème"></button>
       <div class="city-pill" onclick="changeCity()">📍 <span id="cityLabel">—</span> · changer</div>
-      <button class="cart-btn" onclick="showOrderHistory()" style="background:transparent;border:1px solid var(--border);color:var(--text);margin-right:4px">Commandes</button><button class="cart-btn" onclick="toggleCart()">Panier <span class="cart-count" id="cartCount">0</span></button>
+      <button class="orders-btn" onclick="showOrderHistory()" title="Mes commandes">📋</button><button class="cart-btn" onclick="toggleCart()">Panier <span class="cart-count" id="cartCount">0</span></button>
     </div>
   </div>
 
@@ -1339,6 +1352,7 @@
   }
 
     function resetAll(){
+    document.getElementById('successPage').style.display='';
     ['btnPP','btnVir','btnEsp'].forEach(id=>{
       const b=document.getElementById(id); if(!b) return;
       b.disabled=false;
