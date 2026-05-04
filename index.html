@@ -1353,28 +1353,14 @@
 
     function resetAll(){
     document.getElementById('successPage').style.display='';
-    ['btnPP','btnVir','btnEsp'].forEach(id=>{
-      const b=document.getElementById(id); if(!b) return;
-      b.disabled=false;
-    });
-    document.getElementById('btnPP') && (document.getElementById('btnPP').textContent="J'ai payé — Confirmer →");
-    document.getElementById('btnVir') && (document.getElementById('btnVir').textContent="J'ai viré — Confirmer →");
-    document.getElementById('btnEsp') && (document.getElementById('btnEsp').textContent="Confirmer la commande →");
-    hideAllPages();
     document.getElementById('successPage').classList.remove('active');
+    hideAllPages();
     cart=[];renderCart();currentOrderNum='';
     ['ppTelegram','ppAdresse','virTelegram','virAdresse','espTelegram','espAdresse','espDispo'].forEach(id=>document.getElementById(id).value='');
-    // Reset boutons
-    const btns = [
-      {id:'btnPP', text:"J'ai payé — Confirmer →"},
-      {id:'btnVir', text:"J'ai viré — Confirmer →"},
-      {id:'btnEsp', text:"Confirmer la commande →"}
-    ];
+    const resets = [{id:'btnPP',txt:"J'ai payé — Confirmer →"},{id:'btnVir',txt:"J'ai viré — Confirmer →"},{id:'btnEsp',txt:"Confirmer la commande →"}];
+    resets.forEach(r=>{const b=document.getElementById(r.id);if(b){b.disabled=false;b.textContent=r.txt;}});
   }
-  // Reset boutons confirm au retour
-  document.getElementById('btnPP') && (document.getElementById('btnPP').disabled=false, document.getElementById('btnPP').textContent="J'ai payé — Confirmer →");
-  document.getElementById('btnVir') && (document.getElementById('btnVir').disabled=false, document.getElementById('btnVir').textContent="J'ai viré — Confirmer →");
-  document.getElementById('btnEsp') && (document.getElementById('btnEsp').disabled=false, document.getElementById('btnEsp').textContent="Confirmer la commande →");
+
 
 </script>
 </body>
