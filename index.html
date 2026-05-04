@@ -859,7 +859,7 @@
     <div class="topbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="Changer le thème"></button>
       <div class="city-pill" onclick="changeCity()">📍 <span id="cityLabel">—</span> · changer</div>
-      <button class="cart-btn" onclick="toggleCart()">Panier <span class="cart-count" id="cartCount">0</span></button>
+      <button class="cart-btn" onclick="showOrderHistory()" style="background:transparent;border:1px solid var(--border);color:var(--text);margin-right:4px">Commandes</button><button class="cart-btn" onclick="toggleCart()">Panier <span class="cart-count" id="cartCount">0</span></button>
     </div>
   </div>
 
@@ -1268,7 +1268,7 @@
   function goToPayment(){if(!cart.length)return;stopCartTimer();currentOrderNum=genOrderNum();['orderNum','ppOrderNum','virOrderNum','espOrderNum'].forEach(id=>document.getElementById(id).textContent=currentOrderNum);['ppRef','virRef'].forEach(id=>document.getElementById(id).textContent=currentOrderNum);const total=cart.reduce((s,i)=>s+PRODUCTS[i.product].price,0);document.getElementById('orderTotalAmt').textContent=total+' €';document.getElementById('ppAmount').textContent=total+' €';const items=document.getElementById('orderItems');const cityRow=`<div class="order-item-row"><span>📍 Ville</span><span class="fl">${selectedCity}</span></div>`;items.innerHTML=cityRow+cart.map(item=>`<div class="order-item-row"><span>${item.emoji} ${item.name}</span><span class="fl">${item.flavor}</span></div>`).join('');showPage('paymentPage');document.getElementById('cartSidebar').classList.remove('open');startPayTimer();}
   function startPayTimer(){paySeconds=300;payTimer=setInterval(()=>{paySeconds--;const m=String(Math.floor(paySeconds/60)).padStart(2,'0'),s=String(paySeconds%60).padStart(2,'0');['payExpire','ppExpire','virExpire','espExpire'].forEach(id=>document.getElementById(id).textContent=m+':'+s);if(paySeconds<=0){clearInterval(payTimer);hideAllPages();cart=[];renderCart();alert('Commande expirée.');}},1000);}
   function showPage(id){hideAllPages();document.getElementById(id).classList.add('active');}
-  function hideAllPages(){['paymentPage','paypalPage','virementPage','especesPage'].forEach(id=>document.getElementById(id).classList.remove('active'));}
+  function hideAllPages(){['paymentPage','paypalPage','virementPage','especesPage','orderHistoryPage'].forEach(id=>document.getElementById(id).classList.remove('active'));}
   function selectPM(el,pm){document.querySelectorAll('.pm-option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');selectedPM=pm;}
   function goToPayDetail(){if(selectedPM==='paypal')showPage('paypalPage');else if(selectedPM==='virement')showPage('virementPage');else showPage('especesPage');}
   function closePayment(){clearInterval(payTimer);hideAllPages();cart=[];renderCart();}
@@ -1278,8 +1278,24 @@
   async function sendTicket(payment, telegram, adresse, dispo) {
     const total = cart.reduce((s,i)=>s+PRODUCTS[i.product].price,0);
     const items = cart.map(i=>({name:PRODUCTS[i.product].name, flavor:i.flavor, price:PRODUCTS[i.product].price}));
+    // Sauvegarder la commande localement
+    const order = {
+      ref: currentOrderNum,
+      date: new Date().toLocaleDateString('fr-FR'),
+      city: selectedCity,
+      payment: payment,
+      telegram: telegram,
+      adresse: adresse,
+      items: items,
+      total: total
+    };
+    const orders = JSON.parse(localStorage.getItem('meschel_orders') || '[]');
+    orders.unshift(order);
+    localStorage.setItem('meschel_orders', JSON.stringify(orders.slice(0,20)));
+
+    // Envoyer le ticket au bot (best effort)
     try {
-      await fetch(BOT_URL + "/ticket", {
+      fetch(BOT_URL + "/ticket", {
         method:"POST",
         mode:"no-cors",
         headers:{"Content-Type":"application/json"},
