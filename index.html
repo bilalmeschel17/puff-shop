@@ -1149,7 +1149,7 @@
       </div>
         <div class="form-group"><label class="form-label">Adresse de livraison</label><input class="form-input" id="ppAdresse" placeholder="Rue, ville..."/></div>
       </div>
-      <button class="btn-primary" onclick="confirmPP()">J'ai payé — Confirmer →</button>
+      <button class="btn-primary" id="btnPP" onclick="confirmPP()">J'ai payé — Confirmer →</button>
     </div>
   </div>
 
@@ -1176,7 +1176,7 @@
       </div>
         <div class="form-group"><label class="form-label">Adresse de livraison</label><input class="form-input" id="virAdresse" placeholder="Rue, ville..."/></div>
       </div>
-      <button class="btn-primary" onclick="confirmVir()">J'ai viré — Confirmer →</button>
+      <button class="btn-primary" id="btnVir" onclick="confirmVir()">J'ai viré — Confirmer →</button>
     </div>
   </div>
 
@@ -1198,7 +1198,7 @@
         <div class="form-group"><label class="form-label">Adresse</label><input class="form-input" id="espAdresse" placeholder="Rue, ville..."/></div>
         <div class="form-group"><label class="form-label">Disponibilités (optionnel)</label><input class="form-input" id="espDispo" placeholder="Ex: soir après 18h..."/></div>
       </div>
-      <button class="btn-primary" onclick="confirmEsp()">Confirmer la commande →</button>
+      <button class="btn-primary" id="btnEsp" onclick="confirmEsp()">Confirmer la commande →</button>
     </div>
   </div>
 
@@ -1291,18 +1291,22 @@
   async function confirmPP() {
     const tg=document.getElementById('ppTelegram').value.trim(), ad=document.getElementById('ppAdresse').value.trim();
     if(!tg||!ad){alert('Remplis tous les champs.');return;}
+    const btn=document.getElementById('btnPP');
+    btn.disabled=true; btn.textContent='⏳ Envoi en cours...';
     clearInterval(payTimer);
-    document.getElementById('successMsg').textContent='Paiement PayPal — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
     await sendTicket("paypal", tg, ad, "");
+    document.getElementById('successMsg').textContent='Paiement PayPal — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
     showSuccess();
   }
 
   async function confirmVir() {
     const tg=document.getElementById('virTelegram').value.trim(), ad=document.getElementById('virAdresse').value.trim();
     if(!tg||!ad){alert('Remplis tous les champs.');return;}
+    const btn=document.getElementById('btnVir');
+    btn.disabled=true; btn.textContent='⏳ Envoi en cours...';
     clearInterval(payTimer);
-    document.getElementById('successMsg').textContent='Virement confirmé — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
     await sendTicket("virement", tg, ad, "");
+    document.getElementById('successMsg').textContent='Virement confirmé — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') pour la livraison à : '+ad;
     showSuccess();
   }
 
@@ -1310,13 +1314,38 @@
     const tg=document.getElementById('espTelegram').value.trim(), ad=document.getElementById('espAdresse').value.trim();
     const dispo=document.getElementById('espDispo').value.trim();
     if(!tg||!ad){alert('Remplis tous les champs.');return;}
+    const btn=document.getElementById('btnEsp');
+    btn.disabled=true; btn.textContent='⏳ Envoi en cours...';
     clearInterval(payTimer);
-    document.getElementById('successMsg').textContent='Commande prise en charge — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') à : '+ad;
     await sendTicket("especes", tg, ad, dispo);
+    document.getElementById('successMsg').textContent='Commande prise en charge — Ville : '+selectedCity+' — On te contacte sur Telegram ('+tg+') à : '+ad;
     showSuccess();
   }
 
-    function resetAll(){hideAllPages();document.getElementById('successPage').classList.remove('active');cart=[];renderCart();currentOrderNum='';['ppTelegram','ppAdresse','virTelegram','virAdresse','espTelegram','espAdresse','espDispo'].forEach(id=>document.getElementById(id).value='');}
+    function resetAll(){
+    ['btnPP','btnVir','btnEsp'].forEach(id=>{
+      const b=document.getElementById(id); if(!b) return;
+      b.disabled=false;
+    });
+    document.getElementById('btnPP') && (document.getElementById('btnPP').textContent="J'ai payé — Confirmer →");
+    document.getElementById('btnVir') && (document.getElementById('btnVir').textContent="J'ai viré — Confirmer →");
+    document.getElementById('btnEsp') && (document.getElementById('btnEsp').textContent="Confirmer la commande →");
+    hideAllPages();
+    document.getElementById('successPage').classList.remove('active');
+    cart=[];renderCart();currentOrderNum='';
+    ['ppTelegram','ppAdresse','virTelegram','virAdresse','espTelegram','espAdresse','espDispo'].forEach(id=>document.getElementById(id).value='');
+    // Reset boutons
+    const btns = [
+      {id:'btnPP', text:"J'ai payé — Confirmer →"},
+      {id:'btnVir', text:"J'ai viré — Confirmer →"},
+      {id:'btnEsp', text:"Confirmer la commande →"}
+    ];
+  }
+  // Reset boutons confirm au retour
+  document.getElementById('btnPP') && (document.getElementById('btnPP').disabled=false, document.getElementById('btnPP').textContent="J'ai payé — Confirmer →");
+  document.getElementById('btnVir') && (document.getElementById('btnVir').disabled=false, document.getElementById('btnVir').textContent="J'ai viré — Confirmer →");
+  document.getElementById('btnEsp') && (document.getElementById('btnEsp').disabled=false, document.getElementById('btnEsp').textContent="Confirmer la commande →");
+
 </script>
 </body>
 </html>
