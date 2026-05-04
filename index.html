@@ -966,9 +966,6 @@
         <div class="tt-track"><div class="tt-thumb"></div></div>
       </button>
 
-      <!-- Ville -->
-      <div class="city-pill" onclick="changeCity()">📍 <span id="cityLabel">—</span></div>
-
       <!-- Compte -->
       <div class="account-wrap">
         <button class="nav-icon-btn" onclick="toggleAccountMenu()">
@@ -1339,6 +1336,19 @@
     </div>
   </div>
 
+  <!-- ORDER HISTORY PAGE -->
+  <div class="full-page" id="orderHistoryPage">
+    <div class="page-inner" style="max-width:680px">
+      <div class="page-header">
+        <button class="back-btn" onclick="document.getElementById('orderHistoryPage').classList.remove('active')">←</button>
+        <div class="page-title">Mes <em style="font-style:italic;color:var(--rose2)">commandes</em></div>
+      </div>
+      <div id="orderHistoryList">
+        <p style="color:var(--muted);text-align:center;padding:60px 0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px">Aucune commande pour l'instant</p>
+      </div>
+    </div>
+  </div>
+
   <!-- SUCCESS -->
   <div id="successPage">
     <div class="success-icon">✦</div>
@@ -1418,7 +1428,7 @@
 
   let cart=[],selectedCity='',cartTimer=null,cartSeconds=300,payTimer=null,paySeconds=300,selectedPM='paypal',currentOrderNum='';
 
-  function selectCity(city){selectedCity=city;document.getElementById('cityPage').style.display='none';document.getElementById('shopPage').style.display='block';document.getElementById('cityLabel').textContent=city;}
+  function selectCity(city){selectedCity=city;document.getElementById('cityPage').style.display='none';document.getElementById('shopPage').style.display='block';var lbl=document.getElementById('cityLabel'); if(lbl) lbl.textContent=city;}
   function changeCity(){cart=[];renderCart();document.getElementById('shopPage').style.display='none';document.getElementById('cityPage').style.display='flex';}
   function openModalFlavor(key,flavor){const p=PRODUCTS[key];cart.push({product:key,name:p.name,emoji:p.emoji,flavor:flavor,img:p.img});renderCart();openCartSidebar();startCartTimer();}
   function removeFromCart(i){cart.splice(i,1);renderCart();if(!cart.length)stopCartTimer();}
@@ -1480,6 +1490,23 @@
   }
 
     function showSuccess(tg, ad) {
+    // Sauvegarder la commande dans l'historique
+    var orders = [];
+    try { orders = JSON.parse(localStorage.getItem('meschel_orders') || '[]'); } catch(e) {}
+    var total = cart.reduce(function(s,i){ return s + PRODUCTS[i.product].price; }, 0);
+    var now = new Date();
+    var dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+    orders.unshift({
+      ref: currentOrderNum,
+      date: dateStr,
+      city: selectedCity,
+      payment: selectedPM,
+      telegram: tg || '',
+      adresse: ad || '',
+      items: cart.map(function(i){ return {name: PRODUCTS[i.product].name, flavor: i.flavor, price: PRODUCTS[i.product].price}; }),
+      total: total
+    });
+    localStorage.setItem('meschel_orders', JSON.stringify(orders));
     hideAllPages();
     document.getElementById('successOrder').textContent = currentOrderNum;
     document.getElementById('successMsg').textContent = 'Commande confirmée ! On te contacte sur Telegram (' + (tg||'') + ') pour la livraison à : ' + (ad||'');
