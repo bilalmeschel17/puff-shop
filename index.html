@@ -949,6 +949,16 @@
     .badge-pending { display:inline-block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#b07a00; background:rgba(176,122,0,.1); border:1px solid rgba(176,122,0,.25); padding:3px 10px; margin-bottom:6px; }
     .badge-confirmed { display:inline-block; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--green); background:rgba(90,154,106,.1); border:1px solid rgba(90,154,106,.25); padding:3px 10px; margin-bottom:6px; }
 
+  
+    .btn-primary:disabled {
+      opacity:.45; cursor:not-allowed; pointer-events:none;
+    }
+    .pay-countdown {
+      text-align:center; font-size:11px; letter-spacing:1.5px;
+      text-transform:uppercase; color:var(--muted);
+      margin-top:10px; min-height:18px;
+    }
+
   </style>
 </head>
 <body>
@@ -1306,7 +1316,8 @@
       </div>
         <div class="form-group"><label class="form-label">Adresse de livraison</label><input class="form-input" id="ppAdresse" placeholder="Rue, ville..."/></div>
       </div>
-      <button class="btn-primary" onclick="confirmPP()">Envoyer ma commande →</button>
+      <button class="btn-primary" id="ppSubmitBtn" onclick="confirmPP()" disabled>Envoyer ma commande →</button>
+      <p class="pay-countdown" id="ppCountdown">Effectue ton paiement PayPal ci-dessus, puis patiente…</p>
     </div>
   </div>
 
@@ -1330,7 +1341,8 @@
       </div>
         <div class="form-group"><label class="form-label">Adresse de livraison</label><input class="form-input" id="virAdresse" placeholder="Rue, ville..."/></div>
       </div>
-      <button class="btn-primary" onclick="confirmVir()">Envoyer ma commande →</button>
+      <button class="btn-primary" id="virSubmitBtn" onclick="confirmVir()" disabled>Envoyer ma commande →</button>
+      <p class="pay-countdown" id="virCountdown">Effectue ton virement ci-dessus, puis patiente…</p>
     </div>
   </div>
 
@@ -1469,7 +1481,30 @@
   function showPage(id){hideAllPages();document.getElementById(id).classList.add('active');}
   function hideAllPages(){['paymentPage','paypalPage','virementPage','especesPage'].forEach(id=>document.getElementById(id).classList.remove('active'));}
   function selectPM(el,pm){document.querySelectorAll('.pm-option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');selectedPM=pm;}
-  function goToPayDetail(){if(selectedPM==='paypal')showPage('paypalPage');else if(selectedPM==='virement')showPage('virementPage');else showPage('especesPage');}
+  function goToPayDetail(){
+    if(selectedPM==='paypal'){showPage('paypalPage');startPayCountdown('pp',45);}
+    else if(selectedPM==='virement'){showPage('virementPage');startPayCountdown('vir',45);}
+    else showPage('especesPage');
+  }
+
+  function startPayCountdown(prefix, seconds) {
+    var btn = document.getElementById(prefix+'SubmitBtn');
+    var lbl = document.getElementById(prefix+'Countdown');
+    if (!btn || !lbl) return;
+    btn.disabled = true;
+    var remaining = seconds;
+    lbl.textContent = 'Bouton disponible dans ' + remaining + 's — effectue ton paiement d\'abord';
+    var t = setInterval(function() {
+      remaining--;
+      if (remaining > 0) {
+        lbl.textContent = 'Bouton disponible dans ' + remaining + 's — effectue ton paiement d\'abord';
+      } else {
+        clearInterval(t);
+        btn.disabled = false;
+        lbl.textContent = 'Paiement effectué ? Tu peux maintenant envoyer ta commande.';
+      }
+    }, 1000);
+  }
   function closePayment(){clearInterval(payTimer);hideAllPages();cart=[];renderCart();}
   // ⚠️ Remplace avec l'URL de ton bot Railway après déploiement
   const BOT_URL = "https://meschelbot-production.up.railway.app";
@@ -1625,12 +1660,22 @@
             '<span style="font-family:Cormorant Garamond,serif;font-size:20px;font-weight:700;color:var(--text)">' + o.total + ' €</span>' +
           '</div>' +
           '<div style="margin-top:8px;font-size:11px;color:var(--muted)">📬 ' + o.adresse + '</div>' +
+          (isPending ? '<div style="margin-top:14px"><button onclick="cancelOrder(\''+o.ref+'\')" style="width:100%;padding:9px;background:transparent;color:#c0392b;font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid #c0392b;cursor:pointer;">✕ Annuler la commande</button></div>' : '') +
         '</div>';
       }).join('');
     }
     hideAllPages();
     var histPage = document.getElementById('orderHistoryPage');
     if (histPage) histPage.classList.add('active');
+  }
+
+  function cancelOrder(ref) {
+    if (!confirm('Annuler la commande ' + ref + ' ?\n\nAttention : si tu as déjà payé, aucun remboursement ne sera effectué.')) return;
+    var orders = [];
+    try { orders = JSON.parse(localStorage.getItem('meschel_orders') || '[]'); } catch(e) {}
+    orders = orders.filter(function(o) { return o.ref !== ref; });
+    localStorage.setItem('meschel_orders', JSON.stringify(orders));
+    showOrderHistory();
   }
 
   function resetAll(){hideAllPages();document.getElementById('successPage').classList.remove('active');cart=[];renderCart();currentOrderNum='';['ppTel','ppAdresse','virTel','virAdresse','espTel','espAdresse','espDispo'].forEach(id=>document.getElementById(id).value='');}
