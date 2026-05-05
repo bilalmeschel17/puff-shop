@@ -1300,12 +1300,9 @@
       </div>
       <div class="box">
         <div class="form-group">
-        <label class="form-label">Pseudo Telegram</label>
-        <div style="display:flex;gap:8px;align-items:stretch">
-          <input class="form-input" id="ppTelegram" placeholder="@tonpseudo" oninput="updateVerifyBtn('pp')" style="flex:1"/>
-          <a id="ppVerifyBtn" href="#" target="_blank" onclick="return openTelegram('pp')" style="display:flex;align-items:center;padding:0 14px;background:var(--text);color:var(--cream);font-size:10px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;white-space:nowrap;opacity:.4;pointer-events:none;transition:opacity .2s">Vérifier</a>
-        </div>
-        <p style="font-size:10px;color:var(--muted);margin-top:5px;letter-spacing:.5px">Entre ton pseudo puis clique Vérifier pour confirmer que c'est le bon.</p>
+        <label class="form-label">Numéro de téléphone</label>
+        <input class="form-input" id="ppTel" placeholder="06 XX XX XX XX" type="tel"/>
+        <p style="font-size:10px;color:var(--muted);margin-top:5px;letter-spacing:.5px">On te contactera sur ce numéro pour la livraison.</p>
       </div>
         <div class="form-group"><label class="form-label">Adresse de livraison</label><input class="form-input" id="ppAdresse" placeholder="Rue, ville..."/></div>
       </div>
@@ -1327,12 +1324,9 @@
       </div>
       <div class="box">
         <div class="form-group">
-        <label class="form-label">Pseudo Telegram</label>
-        <div style="display:flex;gap:8px;align-items:stretch">
-          <input class="form-input" id="virTelegram" placeholder="@tonpseudo" oninput="updateVerifyBtn('vir')" style="flex:1"/>
-          <a id="virVerifyBtn" href="#" target="_blank" onclick="return openTelegram('vir')" style="display:flex;align-items:center;padding:0 14px;background:var(--text);color:var(--cream);font-size:10px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;white-space:nowrap;opacity:.4;pointer-events:none;transition:opacity .2s">Vérifier</a>
-        </div>
-        <p style="font-size:10px;color:var(--muted);margin-top:5px;letter-spacing:.5px">Entre ton pseudo puis clique Vérifier pour confirmer que c'est le bon.</p>
+        <label class="form-label">Numéro de téléphone</label>
+        <input class="form-input" id="virTel" placeholder="06 XX XX XX XX" type="tel"/>
+        <p style="font-size:10px;color:var(--muted);margin-top:5px;letter-spacing:.5px">On te contactera sur ce numéro pour la livraison.</p>
       </div>
         <div class="form-group"><label class="form-label">Adresse de livraison</label><input class="form-input" id="virAdresse" placeholder="Rue, ville..."/></div>
       </div>
@@ -1348,12 +1342,9 @@
       <div class="box">
         <div class="alert-box">Paiement en espèces à la livraison. On te contacte sur Telegram pour organiser le rendez-vous.</div>
         <div class="form-group">
-        <label class="form-label">Pseudo Telegram</label>
-        <div style="display:flex;gap:8px;align-items:stretch">
-          <input class="form-input" id="espTelegram" placeholder="@tonpseudo" oninput="updateVerifyBtn('esp')" style="flex:1"/>
-          <a id="espVerifyBtn" href="#" target="_blank" onclick="return openTelegram('esp')" style="display:flex;align-items:center;padding:0 14px;background:var(--text);color:var(--cream);font-size:10px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;white-space:nowrap;opacity:.4;pointer-events:none;transition:opacity .2s">Vérifier</a>
-        </div>
-        <p style="font-size:10px;color:var(--muted);margin-top:5px;letter-spacing:.5px">Entre ton pseudo puis clique Vérifier pour confirmer que c'est le bon.</p>
+        <label class="form-label">Numéro de téléphone</label>
+        <input class="form-input" id="espTel" placeholder="06 XX XX XX XX" type="tel"/>
+        <p style="font-size:10px;color:var(--muted);margin-top:5px;letter-spacing:.5px">On te contactera sur ce numéro pour la livraison.</p>
       </div>
         <div class="form-group"><label class="form-label">Adresse</label><input class="form-input" id="espAdresse" placeholder="Rue, ville..."/></div>
         <div class="form-group"><label class="form-label">Disponibilités (optionnel)</label><input class="form-input" id="espDispo" placeholder="Ex: soir après 18h..."/></div>
@@ -1368,7 +1359,7 @@
     <div class="pending-title">Commande<br/><em>envoyée.</em></div>
     <p class="pending-sub">Ton paiement est en cours de vérification. Tu recevras une confirmation sur Telegram dès qu'on aura validé.</p>
     <div class="pending-order" id="pendingOrder">#SHOP-XXXX</div>
-    <button class="btn-outline" onclick="document.getElementById('pendingPage').style.display='none';">← Retour au shop</button>
+    <p id="pendingRedirectMsg" style="font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;opacity:0;transition:opacity .5s"></p>
   </div>
 
   <!-- ORDER HISTORY PAGE -->
@@ -1497,7 +1488,7 @@
   }
 
   async function confirmPP() {
-    const tg=document.getElementById('ppTelegram').value.trim(), ad=document.getElementById('ppAdresse').value.trim();
+    const tg=document.getElementById('ppTel').value.trim(), ad=document.getElementById('ppAdresse').value.trim();
     if(!tg||!ad){alert('Remplis tous les champs.');return;}
     clearInterval(payTimer);
     await sendTicket("paypal", tg, ad, "", true);
@@ -1505,7 +1496,7 @@
   }
 
   async function confirmVir() {
-    const tg=document.getElementById('virTelegram').value.trim(), ad=document.getElementById('virAdresse').value.trim();
+    const tg=document.getElementById('virTel').value.trim(), ad=document.getElementById('virAdresse').value.trim();
     if(!tg||!ad){alert('Remplis tous les champs.');return;}
     clearInterval(payTimer);
     await sendTicket("virement", tg, ad, "", true);
@@ -1513,7 +1504,7 @@
   }
 
   async function confirmEsp() {
-    const tg=document.getElementById('espTelegram').value.trim(), ad=document.getElementById('espAdresse').value.trim();
+    const tg=document.getElementById('espTel').value.trim(), ad=document.getElementById('espAdresse').value.trim();
     const dispo=document.getElementById('espDispo').value.trim();
     if(!tg||!ad){alert('Remplis tous les champs.');return;}
     clearInterval(payTimer);
@@ -1533,7 +1524,7 @@
       date: dateStr,
       city: selectedCity,
       payment: selectedPM,
-      telegram: tg || '',
+      telephone: tg || '',
       adresse: ad || '',
       items: cart.map(function(i){ return {name: PRODUCTS[i.product].name, flavor: i.flavor, price: PRODUCTS[i.product].price}; }),
       total: total,
@@ -1544,6 +1535,21 @@
     document.getElementById('pendingOrder').textContent = currentOrderNum;
     document.getElementById('pendingPage').style.display = 'flex';
     cart = []; renderCart(); currentOrderNum = '';
+    // Redirection vers l'historique après 3 secondes
+    var msg = document.getElementById('pendingRedirectMsg');
+    var secs = 3;
+    msg.textContent = 'Redirection dans ' + secs + ' s…';
+    msg.style.opacity = '1';
+    var countdown = setInterval(function() {
+      secs--;
+      if (secs > 0) {
+        msg.textContent = 'Redirection dans ' + secs + ' s…';
+      } else {
+        clearInterval(countdown);
+        document.getElementById('pendingPage').style.display = 'none';
+        showOrderHistory();
+      }
+    }, 1000);
   }
 
     function showSuccess(tg, ad) {
@@ -1558,7 +1564,7 @@
       date: dateStr,
       city: selectedCity,
       payment: selectedPM,
-      telegram: tg || '',
+      telephone: tg || '',
       adresse: ad || '',
       items: cart.map(function(i){ return {name: PRODUCTS[i.product].name, flavor: i.flavor, price: PRODUCTS[i.product].price}; }),
       total: total
@@ -1627,7 +1633,7 @@
     if (histPage) histPage.classList.add('active');
   }
 
-  function resetAll(){hideAllPages();document.getElementById('successPage').classList.remove('active');cart=[];renderCart();currentOrderNum='';['ppTelegram','ppAdresse','virTelegram','virAdresse','espTelegram','espAdresse','espDispo'].forEach(id=>document.getElementById(id).value='');}
+  function resetAll(){hideAllPages();document.getElementById('successPage').classList.remove('active');cart=[];renderCart();currentOrderNum='';['ppTel','ppAdresse','virTel','virAdresse','espTel','espAdresse','espDispo'].forEach(id=>document.getElementById(id).value='');}
 </script>
 </body>
 </html>
